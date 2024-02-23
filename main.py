@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from dotenv import load_dotenv
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
+
 
 import os
 import logging  # Import the logging module
@@ -18,6 +19,12 @@ app = Flask(__name__)
 
 # Configure logging
 logging.basicConfig(filename='server.log', level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s',filemode='w')
+ALLOWED_IPS = ['52.89.214.238', '34.212.75.30','54.218.53.128','52.32.178.7','127.0.0.1']
+
+@app.before_request
+def limit_remote_addr():
+    if request.remote_addr not in ALLOWED_IPS:
+        abort(403)  # Forbidden
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
